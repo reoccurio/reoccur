@@ -1,6 +1,7 @@
 *.jsbundle
 *.tsbuildinfo
 .DS_Store
+.env
 .history
 .jest
 .next

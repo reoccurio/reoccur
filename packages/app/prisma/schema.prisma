@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = "native"
+}
+
+model User {
+  id              String     @id @default(cuid())
+  email           String     @unique
+  name            String?
+  calendars       Calendar[]
+  sharedCalendars Calendar[] @relation("Shared")
+  timezone        String?    @default("America/New_York")
+  stripeId        String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model Calendar {
+  id          String   @id @default(cuid())
+  name        String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  todos       Todo[]
+  sharedWith  User[]   @relation("Shared")
+  archived    Boolean  @default(false)
+  lastCleared DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Todo {
+  id          String    @id @default(cuid())
+  title       String
+  calendar    Calendar  @relation(fields: [calendarId], references: [id])
+  calendarId  String
+  frequency   Frequency @default(daily)
+  checked     Boolean   @default(false)
+  lastChecked DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum Frequency {
+  daily
+  weekly
+  biweekly
+  monthly
+  quarterly
+  annual
+}
